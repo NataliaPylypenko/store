@@ -1,6 +1,8 @@
 # My project store
 
-### Modules, controllers and providers
+## Modules, controllers and providers
+
+### Modules
 AppModule: AuthModule, ProductModule, ReviewModule, TopPageModule
 
 * module merges dependencies of one domain area
@@ -61,3 +63,85 @@ create modules
 
 create models
 `nest g class product/product.model --no-spec`
+
+### Controllers
+<p>Controllers is application entry point where requests come in.</p>
+<p>HTTP, MQTT, RabbitMQ, Kafka, gRPC</p> 
+
+`http://host.com/api/product/add/1`
+
+`main.ts`
+```typescript
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  await app.listen(3000);
+}
+```
+
+`product.controller.ts`
+```typescript
+@Controller('product')
+export class ProductController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get('add/:id')
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+```
+
+Argument Decorators
+* @Req()
+* @Res()
+* @Params(key?: string)
+* @Body(key?: string)
+* @Query(key?: string)
+* @Headers(name?: string)
+* @Session()
+
+`main.ts`
+```typescript
+// Wildcard
+@Controller('product*s')
+export class ProductController {
+  constructor(private readonly appService: AppService) {}
+}
+```
+
+`product.controller.ts`
+```typescript
+// Custom HTTP code
+@HttpCode(204)
+
+// Custom response header
+@Header('Cashe-Control', 'none')
+
+// Redirect
+@Redirect('https://mydomain.com', 301)
+
+// Subdomain limit
+@Controller({ host: ':admin.mydomain.com'})
+export class ProductController {
+  constructor(private readonly appService: AppService) {}
+}
+
+// Return Promise
+@Get('add/:id')
+async getHello(): Promice<string> {
+  return this.appService.getHello();
+}
+
+// Return Observable
+@Get('add/:id')
+getHello(): Observable<string> {
+  return this.appService.getHello();
+}
+```
+
+create controllers
+`nest g controller product --no-spec`
+
+
+### Providers
