@@ -143,5 +143,94 @@ getHello(): Observable<string> {
 create controllers
 `nest g controller product --no-spec`
 
-
 ### Providers
+@Injectable() an indication that the service can be used as a provider
+```typescript
+import { Injectable } from '@nestjs/common';
+
+@Injectable() 
+export class AppService {
+  getHello() {
+    return 'Hello World!';
+  }
+}
+```
+```typescript
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService]
+})
+export class AppModule {}
+```
+```typescript
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+}
+```
+
+<p>types of providers</p>
+* useClass
+```javascript
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [{
+    provide: AppService,
+    useClass: AppService
+  }]
+})
+export class AppModule {}
+```
+
+* useValue
+```javascript
+const myValue = {};
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [{
+    provide: AppService,
+    useClass: myValue
+  }]
+})
+export class AppModule {}
+```
+
+* useFactory
+```javascript
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [{
+    provide: 'MY_FACTORY',
+    useFactory: (otherService: OtherService) => {
+      const res = otherService.loadSomething();
+      return new CustomFactory(res);
+    },
+    inject: [OtherService]
+  }]
+})
+export class AppModule {}
+```
+
+* useExisting
+```javascript
+const myValue = {};
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [{
+    provide: OtherServiceName,
+    useClass: AppService
+  }]
+})
+export class AppModule {}
+```
+
+<p>types of scope</p>
+* DEFAULT - 1 instance of the provider for all applications
+`@Injectable({ scope: Scope.DEFAULT })`
+* REQUEST - for each request a new one is created
+* TRANSIENT - each injection of this provider will receive a new instance
